@@ -34,9 +34,4 @@ if (isNaN(size)) {
     process.exit(1);
 }
 
-if (size <= 0) {
-    console.log('Please provide a positive number');
-    process.exit(1);
-}
-
 printSquare(size);
