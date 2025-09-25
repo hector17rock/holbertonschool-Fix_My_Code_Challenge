@@ -1,51 +1,45 @@
 #include "lists.h"
+#include <stdlib.h>
 
 /**
  * delete_dnodeint_at_index - deletes the node at index of a dlistint_t list
- * @head: head of the list
- * @index: index of the node to delete
+ * @head: pointer to pointer to head of list
+ * @index: zero-based index of node to delete
  *
- * Return: 1 if it succeeded, -1 if it failed
+ * Return: 1 on success, -1 on failure
  */
 int delete_dnodeint_at_index(dlistint_t **head, unsigned int index)
 {
-	dlistint_t *current;
+	dlistint_t *node;
 	unsigned int i;
 
 	if (head == NULL || *head == NULL)
 		return (-1);
 
-	current = *head;
+	node = *head;
 
-	/* Find the node at index */
-	for (i = 0; i < index && current != NULL; i++)
-		current = current->next;
+	/* Walk to the node at `index` */
+	for (i = 0; node != NULL && i < index; i++)
+		node = node->next;
 
-	if (current == NULL)
+	/* If index is out of range */
+	if (node == NULL)
 		return (-1);
 
-	/* FIXED: Properly delete the node by updating pointers */
-
-	/* If it's the head node */
-	if (current == *head)
-	{
-		*head = current->next;
-		if (*head != NULL)
-			(*head)->prev = NULL;
-	}
+	/* Stitch neighbors together correctly */
+	if (node->prev != NULL)
+		node->prev->next = node->next;
 	else
-	{
-		/* Update the previous node's next pointer */
-		if (current->prev != NULL)
-			current->prev->next = current->next;
-	}
+		*head = node->next;           /* deleting the head */
 
-	/* Update the next node's prev pointer */
-	if (current->next != NULL)
-		current->next->prev = current->prev;
+	if (node->next != NULL)
+		node->next->prev = node->prev;
 
-	/* Free the node */
-	free(current);
+	free(node);
+
+	/* Ensure new head (if any) has prev == NULL */
+	if (*head != NULL)
+		(*head)->prev = NULL;
 
 	return (1);
 }
